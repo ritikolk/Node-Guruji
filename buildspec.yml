@@ -11,10 +11,12 @@ phases:
   post_build:
     commands:
       - echo "Decoding the PEM key..."
-      - echo "$PEM_KEY" > task.pem  # Use the environment variable directly without base64 decoding
+      - echo "$PEM_KEY" | base64 --decode > task.pem
+      - echo "Checking permissions for task.pem"
       - chmod 400 task.pem
+      - echo "PEM_KEY length: ${#PEM_KEY}" # Debugging: Check length of the PEM_KEY
       - echo "Deploying to server"
-      - ssh -o StrictHostKeyChecking=no -i "task.pem" ubuntu@54.198.182.121 'cd /home/ubuntu/express-example/express-main-example && git pull && npm install && pm2 restart index'
+      - ssh -o StrictHostKeyChecking=no -i "task.pem" ubuntu@54.198.182.121 'cd /home/ubuntu/express-example/express-main-example && git pull && npm install && pm2 restart index || echo "SSH command failed!"'
 
 artifacts:
   files:
