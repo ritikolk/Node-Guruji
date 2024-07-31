@@ -3,22 +3,20 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 16 # Adjust the Node.js version as needed
+      nodejs: 16
     commands:
       - npm install
   build:
     commands:
       - echo "Building the application..."
-      - npm run build # Ensure this script is defined in your package.json
+      - npm run build
   post_build:
     commands:
+      - echo "Decoding the PEM key..."
+      - echo "$PEM_KEY" | base64 --decode > task.pem
+      - chmod 400 task.pem
       - echo "Deploying to server"
-      - |
-        if [ -f "task.pem" ]; then
-          ssh -o StrictHostKeyChecking=no -i "task.pem" ubuntu@54.198.182.121 'cd /home/ubuntu/express-example/express-main-example && git pull && npm install && pm2 restart index'
-        else
-          echo "task.pem not found. Ensure the key is accessible."
-        fi
+      - ssh -o StrictHostKeyChecking=no -i "task.pem" ubuntu@54.198.182.121 'cd /home/ubuntu/express-example/express-main-example && git pull && npm install && pm2 restart index'
 
 artifacts:
   files:
