@@ -6,14 +6,11 @@ phases:
       nodejs: 16
     commands:
       - npm install
-  build:
-    commands:
-      - echo "Building the application..."
-      - npm run build
+
   post_build:
     commands:
       - echo "Decoding the PEM key..."
-      - echo "$PEM_KEY" | base64 --decode > task.pem
+      - echo "PEM_KEY" | base64 --decode > task.pem
       - chmod 400 task.pem
       - echo "Deploying to server"
       - ssh -o StrictHostKeyChecking=no -i "task.pem" ubuntu@54.198.182.121 'cd /home/ubuntu/express-example/express-main-example && git pull && npm install && pm2 restart index'
