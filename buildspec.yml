@@ -1,0 +1,28 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 16 # Adjust the Node.js version as needed
+    commands:
+      - npm install
+  pre_build:
+    commands:
+      - echo "Running tests..."
+      - npm test # Optional, remove if not needed
+  build:
+    commands:
+      - echo "Building the application..."
+      - npm run build # Optional, if you have a build command
+  post_build:
+    commands:
+      - echo "Deploying to server"
+      - ssh -o StrictHostKeyChecking=no -i "task.pem" ubuntu@54.198.182.121 'cd /home/ubuntu/express-example/express-main-example && git pull && npm install && pm2 restart index'
+
+artifacts:
+  files:
+    - '**/*'
+
+cache:
+  paths:
+    - node_modules/**/*
