@@ -9,11 +9,16 @@ phases:
   build:
     commands:
       - echo "Building the application..."
-      - npm run build # Optional, if you have a build command
+      - npm run build # Ensure this script is defined in your package.json
   post_build:
     commands:
       - echo "Deploying to server"
-      - ssh -o StrictHostKeyChecking=no -i "task.pem" ubuntu@54.198.182.121 'cd /home/ubuntu/express-example/express-main-example && git pull && npm install && pm2 restart index'
+      - |
+        if [ -f "task.pem" ]; then
+          ssh -o StrictHostKeyChecking=no -i "task.pem" ubuntu@54.198.182.121 'cd /home/ubuntu/express-example/express-main-example && git pull && npm install && pm2 restart index'
+        else
+          echo "task.pem not found. Ensure the key is accessible."
+        fi
 
 artifacts:
   files:
